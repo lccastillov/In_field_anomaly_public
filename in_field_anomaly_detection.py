@@ -1,6 +1,28 @@
-#The data folder path is '/Users/lilianacastillo/Documents/Data_Analysis/Ibague'
-###############################################################
-#####     Import all packates required     #####
+## ---------------------------
+##
+## Script name: Match_satellite_plot_info
+##
+## Purpose of script:
+#                   1. Retrieve in-field anomalies using only Vegetation indices derived from optical imagery.
+#                   2. It stores the statistics per field into a hdf5 file. The stats include percecntage of aomalies,
+#                   mean VI value per plot, mean VI values for the anomalous areas.
+
+##
+## Author: Liliana Castillo Villamor. Affiliation: Aberystwyth University
+
+##
+## Date Created: 01/03/2021
+##
+## Copyright (c) Liliana Castillo Villamor, 2021
+## Email: lic42@aber.ac.uk
+##
+## ---------------------------
+##
+## Notes:
+## the hdf5 file is created by using the script in_field_anomaly_detection.py
+##
+## ---------------------------
+
 import rsgislib
 import glob
 import rsgislib.imagecalc
@@ -23,36 +45,30 @@ from osgeo import gdalnumeric
 #Location of the root folder
 m_root='/data'
 
-
-DEM = m_root+'/DEM/DEM_Ibague.kea'
-# Set out data type,  format and sensor
+## set working directory when using Docker
 datatype = rsgislib.TYPE_32FLOAT
 gdalformat = 'KEA'
 Sensor = 'sen2'
-
-CloudFree_RegImagesFolder=m_root+'/CloudFree_RegImages'
+prefix='SEN2'
 
 StackVIFolder=m_root+'/StacksVIs'
 AnomaliesPath=m_root+'/Anomalies/'
 
-
+## List of all the VIs to be analised
 VIList=['NDVI8A','NDVI8','EVI8A','EVI8', 'GCI8A', 'GCI8','GNDVI8A', 'GNDVI8','RECI8A_RE_B5', 'RECI8A_RE_B6',  'RECI8A_RE_B7', 'RECI8_RE_B5', 'RECI8_RE_B6',  'RECI8_RE_B7', \
         'RENDVI8A_RE_B5', 'RENDVI8A_RE_B6','RENDVI8A_RE_B7', 'RENDVI8_RE_B5', 'RENDVI8_RE_B6','RENDVI8_RE_B7', 'SAVI8A','SAVI8',\
         'NDWI8_SWIR1', 'NDWI8_SWIR2', 'NDWI8A_SWIR1', 'NDWI8A_SWIR2']
 
-prefix='SEN2'
+
 
 
 entrada_plot_histograms=input(" Do you want to plot the histograms Y/N: ")
 print("You said ", entrada_plot_histograms)
 
 
-##################################################################
-########   Running Histogram Analysis ######
-##################################################################
 def histAnalysis():
     print("\n HISTOGRAM ANALYSIS started at", datetime.datetime.now()," \n")
-    import functions_histoAnalysis
+    import FunctionsHistoAnalysis
     driver = gdal.GetDriverByName(gdalformat)
     
 
@@ -76,7 +92,7 @@ def histAnalysis():
 
         #####################################
         # ££££ Run the function ££££ #        
-        functions_histoAnalysis.multiplehistothresholds (VI_Image, clumps_image, Anom_class_image, driver, \
-                                                         histometrics, entrada_plot_histograms, m_root)
+        FunctionsHistoAnalysis.multiplehistothresholds (VI_Image, clumps_image, Anom_class_image, driver, \
+                                                        histometrics, entrada_plot_histograms, m_root)
         print("Finished histogram analysis over ", VI, "images")
     print("\n ENDED HISTOGRAM ANALYSIS AT ", datetime.datetime.now())
